@@ -28,30 +28,40 @@ namespace FlyCargo.GUI
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
 
-            this.Load += ProductCategoryForm_Load; // Registruj Load događaj
+            this.Load += ProductCategoryForm_Load;
         }
 
         private void SetupDataGridView()
         {
             dgvProductCategories.Columns.Clear();
         }
-
-
-        private async Task LoadProductCategories()
+        private async Task LoadProductCategories(string sSearchByName = null)
         {
-            var productCategories = await _productCategoryRepository.GetAllProductCategoriesAsync();
-
-            var result = productCategories.Select(pc => new
+            try
             {
-                pc.ProductId,
-                ProductName = pc.Product.ProductName, // Koristi naziv proizvoda
-                pc.CategoryId,
-                CategoryName = pc.Category.CategoryName // Koristi naziv kategorije
-            }).ToList();
+                var productCategories = await _productCategoryRepository.GetAllProductCategoriesAsync();
 
-            dgvProductCategories.DataSource = result;
-        }
+                var result = productCategories.Select(pc => new
+                {
+                    pc.ProductId,
+                    ProductName = pc.Product.ProductName,
+                    pc.CategoryId,
+                    CategoryName = pc.Category.CategoryName
+                });
+                 
+                if (!string.IsNullOrEmpty(sSearchByName))
+                {
+                    string searchUpper = sSearchByName.ToUpper();  
+                    result = result.Where(pc => pc.ProductName.ToUpper().Contains(searchUpper) || pc.CategoryName.ToUpper().Contains(searchUpper));
+                }
 
+                dgvProductCategories.DataSource = result.ToList();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        } 
 
 
         private async void ProductCategoryForm_Load(object sender, EventArgs e)
@@ -94,12 +104,11 @@ namespace FlyCargo.GUI
 
                 if (productCategory != null)
                 {
-                    // Učitaj podatke za uređivanje u AddProductCategories formi
                     var editForm = new AddProductCategories(_productRepository, _categoryRepository, _productCategoryRepository, productCategory);
 
                     if (editForm.ShowDialog() == DialogResult.OK)
                     {
-                        await LoadProductCategories(); // Ponovo učitaj podatke nakon uređivanja
+                        await LoadProductCategories();
                     }
                 }
                 else
@@ -115,21 +124,16 @@ namespace FlyCargo.GUI
 
         private async void btnDelete_Click(object sender, EventArgs e)
         {
-            // Provera da li je red u DataGridView selektovan
             if (dgvProductCategories.SelectedRows.Count > 0)
             {
-                // Dobijanje selektovanog reda
                 var selectedRow = dgvProductCategories.SelectedRows[0];
 
-                // Pretpostavka: ProductId i CategoryId su kolone u DataGridView
                 var productId = (int)selectedRow.Cells["ProductId"].Value;
                 var categoryId = (int)selectedRow.Cells["CategoryId"].Value;
 
-                // Pitanje korisniku da li želi da obriše zapis
                 var confirmResult = MessageBox.Show("Da li ste sigurni da želite da obrišete ovaj zapis?", "Potvrda brisanja", MessageBoxButtons.YesNo);
                 if (confirmResult == DialogResult.Yes)
                 {
-                    // Brisanje veze
                     await _productCategoryRepository.DeleteProductCategoryAsync(productId, categoryId);
                     MessageBox.Show("Veza između proizvoda i kategorije je uspešno obrisana.");
 
@@ -142,6 +146,27 @@ namespace FlyCargo.GUI
             }
         }
 
+        private async void cbSearch_CheckedChanged(object sender, EventArgs e)
+        {
+            string sSearchByName = tbSearchByName.Text;
+            if (!String.IsNullOrEmpty(sSearchByName))
+            {
+                tbSearchByName.Text = String.Empty;
+                await LoadProductCategories();
+            }
+        }
+
+        private async void btnSearch_Click(object sender, EventArgs e)
+        {
+            string sSearchByName = tbSearchByName.Text;
+            if (String.IsNullOrEmpty(sSearchByName) || sSearchByName.Count() < 1)
+            {
+                MessageBox.Show("For search category and product you must input min. 2 chars!");
+                return;
+            }
+
+            await LoadProductCategories(sSearchByName);
+        }
     }
 
 }

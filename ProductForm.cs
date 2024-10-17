@@ -71,11 +71,32 @@ namespace FlyCargo.GUI
                 MessageBox.Show(ex.Message);
             }
         }
-         
 
-        private void btnDelete_Click(object sender, EventArgs e)
+
+        private async void btnDelete_Click(object sender, EventArgs e)
         {
+            if (dgvProducts.CurrentRow != null)
+            {
+                int productId = Convert.ToInt32(dgvProducts.CurrentRow.Cells["ProductId"].Value);
+                ProductRepository productRepository = new ProductRepository(_context);
+                bool canDelete = await productRepository.CanDeleteProduct(productId);
 
+                if (canDelete)
+                {
+                    MessageBox.Show("This product cannot be deleted because it is linked to existing products.", "Delete Not Allowed", MessageBoxButtons.OK);
+                    return;
+                }
+                DialogResult dialogResult = MessageBox.Show("Are you sure you want to delete this product?", "Confirm Delete", MessageBoxButtons.YesNo);
+                if (dialogResult == DialogResult.Yes)
+                {
+                    await productRepository.DeleteProduct(productId);
+                    ProductForm_Load(sender, e);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please select a product to delete.");
+            } 
         }
 
         private async void btnSave_Click(object sender, EventArgs e)

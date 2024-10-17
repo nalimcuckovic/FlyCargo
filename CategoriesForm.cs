@@ -41,19 +41,17 @@ namespace FlyCargo.GUI
             try
             {
                 _context = new AppDbContext();
-                await _context.Categories.LoadAsync(); // Asinkrono učitavanje podataka
+                await _context.Categories.LoadAsync();  
 
                 var categoriesQuery = _context.Categories.AsQueryable();
-
-                // Ako je prosleđen parametar sSearchByName, filtriraj kategorije po nazivu
+                 
                 if (!string.IsNullOrEmpty(sSearchByName))
                 {
                     categoriesQuery = categoriesQuery.Where(c => c.CategoryName.Contains(sSearchByName));
                 }
 
                 var categories = await categoriesQuery.ToListAsync();
-
-                // Postavi podatke u DataGridView
+                 
                 dgvCategories.DataSource = categories.Select(c => new
                 {
                     c.CategoryId,
@@ -141,8 +139,7 @@ namespace FlyCargo.GUI
             if (dgvCategories.CurrentRow != null)
             {
                 int categoryId = Convert.ToInt32(dgvCategories.CurrentRow.Cells["CategoryId"].Value);
-
-                // Proveri da li se kategorija može obrisati
+                 
                 CategoryRepository categoryRepository = new CategoryRepository(_context);
                 bool canDelete = await categoryRepository.CanDeleteCategory(categoryId);
 
