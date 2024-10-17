@@ -36,15 +36,24 @@ namespace FlyCargo.GUI
             await LoadProductsAsync(_context);
         }
 
-        private async Task LoadProductsAsync(AppDbContext _context)
+        private async Task LoadProductsAsync(AppDbContext _context, string sSearchByName = null)
         {
             try
             {
                 _context = new AppDbContext();
-                _context.Products.Load();
-                var products = _context.Products.Local.ToBindingList();
+                await _context.Products.LoadAsync(); // Koristi await za asinkrono učitavanje podataka
 
-                dgvProducts.DataSource = products;
+                var productsQuery = _context.Products.AsQueryable();
+
+                // Ako je prosleđen parametar sSearchByName, filtriraj proizvode po nazivu
+                if (!string.IsNullOrEmpty(sSearchByName))
+                {
+                    productsQuery = productsQuery.Where(p => p.ProductName.Contains(sSearchByName));
+                }
+
+                var products = await productsQuery.ToListAsync();
+
+                // Postavi podatke u DataGridView
                 dgvProducts.DataSource = products.Select(p => new
                 {
                     p.ProductId,
@@ -62,6 +71,7 @@ namespace FlyCargo.GUI
                 MessageBox.Show(ex.Message);
             }
         }
+         
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
@@ -166,6 +176,28 @@ namespace FlyCargo.GUI
             {
                 MessageBox.Show("You did not double click grid view!");
                 return;
+            }
+        }
+
+        private async void btnSearch_Click(object sender, EventArgs e)
+        {
+            string sSearchByName = tbSearchByName.Text;
+            if (String.IsNullOrEmpty(sSearchByName) || sSearchByName.Count() < 1)
+            {
+                MessageBox.Show("For search product, you must input min. 2 chars!");
+                return;
+            }
+
+            await LoadProductsAsync(_context, sSearchByName);
+        } 
+
+        private async void cbClearSearch_CheckedChanged(object sender, EventArgs e)
+        {
+            string sSearchByName = tbSearchByName.Text;
+            if (!String.IsNullOrEmpty(sSearchByName))
+            {
+                tbSearchByName.Text = String.Empty;
+                await LoadProductsAsync(_context);
             }
         }
     }

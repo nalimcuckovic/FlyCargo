@@ -36,15 +36,24 @@ namespace FlyCargo.GUI
             await LoadCategoriesAsync(_context);
         }
 
-        private async Task LoadCategoriesAsync(AppDbContext _context)
+        private async Task LoadCategoriesAsync(AppDbContext _context, string sSearchByName = null)
         {
             try
             {
                 _context = new AppDbContext();
-                _context.Categories.Load();
-                var categories = _context.Categories.Local.ToBindingList();
+                await _context.Categories.LoadAsync(); // Asinkrono učitavanje podataka
 
-                dgvCategories.DataSource = categories;
+                var categoriesQuery = _context.Categories.AsQueryable();
+
+                // Ako je prosleđen parametar sSearchByName, filtriraj kategorije po nazivu
+                if (!string.IsNullOrEmpty(sSearchByName))
+                {
+                    categoriesQuery = categoriesQuery.Where(c => c.CategoryName.Contains(sSearchByName));
+                }
+
+                var categories = await categoriesQuery.ToListAsync();
+
+                // Postavi podatke u DataGridView
                 dgvCategories.DataSource = categories.Select(c => new
                 {
                     c.CategoryId,
@@ -58,14 +67,14 @@ namespace FlyCargo.GUI
             {
                 MessageBox.Show(ex.Message);
             }
-        }
+        } 
 
 
         private void SetupDataGridView()
         {
             dgvCategories.Columns.Clear();
         }
-         
+
 
         private async void btnSave_Click(object sender, EventArgs e)
         {
@@ -153,6 +162,28 @@ namespace FlyCargo.GUI
             else
             {
                 MessageBox.Show("Please select a category to delete.");
+            }
+        }
+
+        private async void btnSearch_Click(object sender, EventArgs e)
+        {
+            string sSearchByName = tbSearchByName.Text;
+            if (String.IsNullOrEmpty(sSearchByName) || sSearchByName.Count() < 1)
+            {
+                MessageBox.Show("For search category, you must input min. 2 chars!");
+                return;
+            }
+
+            await LoadCategoriesAsync(_context, sSearchByName);
+        }
+
+        private async void cbClearSearch_CheckedChanged(object sender, EventArgs e)
+        {
+            string sSearchByName = tbSearchByName.Text;
+            if (!String.IsNullOrEmpty(sSearchByName))
+            {
+                tbSearchByName.Text = String.Empty;
+                await LoadCategoriesAsync(_context);
             }
         }
     }

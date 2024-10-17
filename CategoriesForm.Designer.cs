@@ -36,6 +36,9 @@
             label2 = new Label();
             btnSave = new Button();
             label3 = new Label();
+            btnSearch = new Button();
+            cbClearSearch = new CheckBox();
+            tbSearchByName = new TextBox();
             ((System.ComponentModel.ISupportInitialize)dgvCategories).BeginInit();
             SuspendLayout();
             // 
@@ -111,11 +114,42 @@
             label3.TabIndex = 9;
             label3.Text = "For edit you must double click in data grid";
             // 
+            // btnSearch
+            // 
+            btnSearch.Location = new Point(435, 31);
+            btnSearch.Name = "btnSearch";
+            btnSearch.Size = new Size(95, 23);
+            btnSearch.TabIndex = 10;
+            btnSearch.Text = "Search";
+            btnSearch.UseVisualStyleBackColor = true;
+            btnSearch.Click += btnSearch_Click;
+            // 
+            // cbClearSearch
+            // 
+            cbClearSearch.AutoSize = true;
+            cbClearSearch.Location = new Point(700, 38);
+            cbClearSearch.Name = "cbClearSearch";
+            cbClearSearch.Size = new Size(90, 19);
+            cbClearSearch.TabIndex = 11;
+            cbClearSearch.Text = "Clear search";
+            cbClearSearch.UseVisualStyleBackColor = true;
+            cbClearSearch.CheckedChanged += cbClearSearch_CheckedChanged;
+            // 
+            // tbSearchByName
+            // 
+            tbSearchByName.Location = new Point(536, 32);
+            tbSearchByName.Name = "tbSearchByName";
+            tbSearchByName.Size = new Size(158, 23);
+            tbSearchByName.TabIndex = 12;
+            // 
             // CategoriesForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(815, 363);
+            Controls.Add(tbSearchByName);
+            Controls.Add(cbClearSearch);
+            Controls.Add(btnSearch);
             Controls.Add(label3);
             Controls.Add(btnSave);
             Controls.Add(label2);
@@ -142,5 +176,8 @@
         private Label label2;
         private Button btnSave;
         private Label label3;
+        private Button btnSearch;
+        private CheckBox cbClearSearch;
+        private TextBox tbSearchByName;
     }
 }

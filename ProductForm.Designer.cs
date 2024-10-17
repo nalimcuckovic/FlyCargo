@@ -42,6 +42,9 @@
             label5 = new Label();
             nudProductStockQuantity = new NumericUpDown();
             label6 = new Label();
+            btnSearch = new Button();
+            tbSearchByName = new TextBox();
+            cbClearSearch = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)dgvProducts).BeginInit();
             ((System.ComponentModel.ISupportInitialize)nudProductStockQuantity).BeginInit();
             SuspendLayout();
@@ -50,10 +53,10 @@
             // 
             dgvProducts.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvProducts.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvProducts.Location = new Point(274, 25);
+            dgvProducts.Location = new Point(274, 67);
             dgvProducts.Name = "dgvProducts";
             dgvProducts.RowTemplate.Height = 25;
-            dgvProducts.Size = new Size(657, 427);
+            dgvProducts.Size = new Size(657, 385);
             dgvProducts.TabIndex = 0;
             dgvProducts.DoubleClick += dgvProducts_DoubleClick;
             // 
@@ -97,7 +100,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(274, 7);
+            label2.Location = new Point(274, 45);
             label2.Name = "label2";
             label2.Size = new Size(230, 15);
             label2.TabIndex = 5;
@@ -172,11 +175,42 @@
             label6.TabIndex = 13;
             label6.Text = "Stock quantity";
             // 
+            // btnSearch
+            // 
+            btnSearch.Location = new Point(526, 35);
+            btnSearch.Name = "btnSearch";
+            btnSearch.Size = new Size(111, 25);
+            btnSearch.TabIndex = 14;
+            btnSearch.Text = "Search";
+            btnSearch.UseVisualStyleBackColor = true;
+            btnSearch.Click += btnSearch_Click;
+            // 
+            // tbSearchByName
+            // 
+            tbSearchByName.Location = new Point(643, 35);
+            tbSearchByName.Name = "tbSearchByName";
+            tbSearchByName.Size = new Size(192, 23);
+            tbSearchByName.TabIndex = 15;
+            // 
+            // cbClearSearch
+            // 
+            cbClearSearch.AutoSize = true;
+            cbClearSearch.Location = new Point(841, 41);
+            cbClearSearch.Name = "cbClearSearch";
+            cbClearSearch.Size = new Size(90, 19);
+            cbClearSearch.TabIndex = 16;
+            cbClearSearch.Text = "Clear search";
+            cbClearSearch.UseVisualStyleBackColor = true;
+            cbClearSearch.CheckedChanged += cbClearSearch_CheckedChanged;
+            // 
             // ProductForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(956, 498);
+            Controls.Add(cbClearSearch);
+            Controls.Add(tbSearchByName);
+            Controls.Add(btnSearch);
             Controls.Add(label6);
             Controls.Add(nudProductStockQuantity);
             Controls.Add(label5);
@@ -215,5 +249,8 @@
         private Label label5;
         private NumericUpDown nudProductStockQuantity;
         private Label label6;
+        private Button btnSearch;
+        private TextBox tbSearchByName;
+        private CheckBox cbClearSearch;
     }
 }
